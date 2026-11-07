@@ -1,0 +1,20 @@
+{
+  "name": "Покерный тренер",
+  "short_name": "Покер",
+  "description": "Тренажёр покера для новичка: комбинации, шансы, решения и игра с ботами. Работает без интернета.",
+  "lang": "ru",
+  "id": "./poker-trainer.html",
+  "start_url": "./poker-trainer.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0f1412",
+  "theme_color": "#0d6a4d",
+  "categories": ["games", "education"],
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
