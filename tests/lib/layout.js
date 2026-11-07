@@ -58,11 +58,13 @@ const STRESS = `
     G.betPos = {}; G.prevBets = g.players.map(p => p.bet);
     // кнопка дилера по очереди у каждого места: она стоит рядом с местом и может задеть чужие фишки
     const out = new Set(), button = g.button;
+    // самое длинное название комбинации на текущем языке («Старшая карта», «Three of a kind»)
+    const longest = PK.CAT_NAMES.reduce((a, b) => b.length > a.length ? b : a);
     for (let b = 0; b < g.players.length; b++) {
       g.button = b;
       __pkui.renderTable();
-      // На вскрытии под стеком добавляется строка с названием комбинации — место становится выше
-      if (showdown) __t.$$('#table .sbox').forEach(b => { const d = document.createElement('div'); d.className = 'shand'; d.textContent = 'Две пары'; b.insertBefore(d, b.querySelector('.sact')); });
+      // На вскрытии под стеком добавляется строка с названием комбинации — место становится выше; берём самое длинное
+      if (showdown) __t.$$('#table .sbox').forEach(b => { const d = document.createElement('div'); d.className = 'shand'; d.textContent = longest; b.insertBefore(d, b.querySelector('.sact')); });
       // ждём только первую отрисовку: дальше карты те же и анимаций раздачи нет
       if (b === 0) { await __t.sleep(30); await __t.until(() => !document.getAnimations().some(a => a.playState === 'running'), 900); }
       scrollTo(0, 0);

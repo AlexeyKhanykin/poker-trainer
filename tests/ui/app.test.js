@@ -29,7 +29,7 @@ const OUT = path.join(__dirname, '..', 'out');
 
     // Тренажёр: каждый режим в каждом варианте
     const MODES = await E("return __t.$$('#mode-tabs [data-mode]').map(b => b.dataset.mode)");
-    TS.eq('7 режимов тренажёра', MODES, ['name', 'best', 'winner', 'speed', 'odds', 'preflop', 'review']);
+    TS.eq('8 режимов тренажёра', MODES, ['name', 'best', 'winner', 'speed', 'odds', 'preflop', 'spot', 'review']);
     for (const vk of ['holdem', 'omaha', 'omaha5', 'short']) {
       TS.group('тренажёр · ' + vk);
       const sel = await E(`const s = __t.$('#variant-select'); s.value = '${vk}'; s.dispatchEvent(new Event('change', { bubbles: true })); await __t.sleep(80); return s.value`);
