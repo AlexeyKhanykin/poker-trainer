@@ -1,7 +1,7 @@
 // Тренажёр с сайта (как на GitHub Pages): устанавливается как приложение и работает без интернета.
 const path = require('path');
 const H = require('../lib/harness');
-const { launch, PAGE_HELPERS } = require('../lib/cdp');
+const { launch, PAGE_HELPERS, fileUrl } = require('../lib/cdp');
 const { serve } = require('../lib/serve');
 const TS = H.suite('Интерфейс: приложение с сайта и работа без интернета (Chrome)');
 
@@ -16,10 +16,19 @@ const TS = H.suite('Интерфейс: приложение с сайта и р
 
     TS.group('адрес сайта');
     await page.goto(site.url);
-    await E("await __t.until(() => location.pathname.endsWith('poker-trainer.html') && window.PKStore && document.readyState === 'complete', 5000); return 1");
-    TS.check('корень сайта открывает тренажёр', await E('return location.pathname.endsWith("/poker-trainer.html")'), await E('return location.href'));
+    await E("await __t.until(() => window.PKStore && document.readyState === 'complete', 5000); return 1");
+    TS.eq('тренажёр открывается прямо по адресу сайта, без имени файла', await E('return location.pathname'), '/');
     await E("await __t.until(() => PKStore.info().backend !== 'memory'); return 1");
     TS.eq('данные хранятся в IndexedDB', await E('return PKStore.info().backend'), 'indexeddb');
+    // Старый адрес из закладок ведёт на новый — и на сайте, и в файле на диске
+    await page.goto(site.url + 'poker-trainer.html?x=1#y');
+    await E("await __t.until(() => window.PKStore && document.readyState === 'complete', 5000); return 1");
+    TS.eq('старый адрес poker-trainer.html ведёт на адрес сайта (с параметрами)', await E('return location.pathname + location.search + location.hash'), '/?x=1#y');
+    await page.goto(fileUrl(path.join(H.ROOT, 'poker-trainer.html')));
+    await E("await __t.until(() => window.PKStore && document.readyState === 'complete', 5000); return 1");
+    TS.check('старый файл poker-trainer.html открывает index.html с диска', await E('return location.href.endsWith("/index.html")'), await E('return location.href'));
+    await page.goto(site.url);
+    await E("await __t.until(() => window.PKStore && document.readyState === 'complete', 5000); return 1");
 
     TS.group('служебный скрипт');
     const reg = await E(`const r = await __t.until(() => navigator.serviceWorker && navigator.serviceWorker.controller ? 1 : 0, 100) ; const reg = await navigator.serviceWorker.ready; return { scope: reg.scope, active: !!reg.active }`);
@@ -28,7 +37,7 @@ const TS = H.suite('Интерфейс: приложение с сайта и р
     const cached = await E(`const keys = await caches.keys(); const c = await caches.open(keys.find(k => k.startsWith('poker-trainer-')));
       const list = (await c.keys()).map(r => new URL(r.url).pathname); return { keys, list }`);
     TS.check('кэш создан', cached.keys.some(k => /^poker-trainer-v\d+$/.test(k)), cached.keys);
-    TS.check('все файлы сохранены заранее', ['/poker-trainer.html', '/js/ui.js', '/js/i18n-en.js', '/css/style.css', '/manifest.webmanifest', '/icons/icon-512.png'].every(p => cached.list.includes(p)), cached.list);
+    TS.check('все файлы сохранены заранее', ['/', '/index.html', '/js/ui.js', '/js/i18n-en.js', '/css/style.css', '/manifest.webmanifest', '/icons/icon-512.png'].every(p => cached.list.includes(p)), cached.list);
 
     TS.group('установка');
     const inst = await page.cdp('Page.getInstallabilityErrors');

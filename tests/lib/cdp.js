@@ -1,5 +1,5 @@
 // Мини-драйвер Chrome через DevTools Protocol — без внешних библиотек (нужен Node 22+ и установленный Chrome).
-// Открывает poker-trainer.html с диска в Chrome без окна, выполняет код на странице, эмулирует экран телефона.
+// Открывает тренажёр (index.html) с диска в Chrome без окна, выполняет код на странице, эмулирует экран телефона.
 'use strict';
 const fs = require('fs');
 const os = require('os');

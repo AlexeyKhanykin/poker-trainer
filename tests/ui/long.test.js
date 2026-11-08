@@ -5,7 +5,7 @@ const path = require('path');
 const H = require('../lib/harness');
 const { launch, PAGE_HELPERS, fileUrl } = require('../lib/cdp');
 const TS = H.suite('Интерфейс: долгая сессия и большая история (Chrome)');
-const URL = fileUrl(path.join(H.ROOT, 'poker-trainer.html'));
+const URL = fileUrl(path.join(H.ROOT, 'index.html'));
 const HANDS = H.QUICK ? 200 : 1000;
 
 const FAST_TIMERS = `(() => { const st = window.setTimeout; window.setTimeout = (f, ms, ...a) => st(f, ms > 50 && ms < 2400 ? Math.ceil(ms / 50) : ms, ...a); })();`;

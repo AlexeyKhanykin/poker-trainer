@@ -4,7 +4,7 @@ const path = require('path');
 const H = require('../lib/harness');
 const { launch, PAGE_HELPERS, fileUrl } = require('../lib/cdp');
 const TS = H.suite('Интерфейс: телефон, планшет, поворот экрана (Chrome)');
-const URL = fileUrl(path.join(H.ROOT, 'poker-trainer.html'));
+const URL = fileUrl(path.join(H.ROOT, 'index.html'));
 const OUT = path.join(__dirname, '..', 'out', 'mobile');
 
 const { GEO, STRESS } = require('../lib/layout');

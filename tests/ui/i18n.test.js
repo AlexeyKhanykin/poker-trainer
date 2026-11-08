@@ -3,7 +3,7 @@ const path = require('path');
 const H = require('../lib/harness');
 const { launch, PAGE_HELPERS, fileUrl } = require('../lib/cdp');
 const TS = H.suite('Интерфейс: английская версия (Chrome)');
-const URL = fileUrl(path.join(H.ROOT, 'poker-trainer.html'));
+const URL = fileUrl(path.join(H.ROOT, 'index.html'));
 
 // Где на экране остались русские буквы: видимый текст, подсказки (title), aria-label, заголовок окна.
 const CYR = `

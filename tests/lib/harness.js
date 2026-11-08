@@ -14,7 +14,7 @@ const N = (full, quick) => QUICK ? (quick != null ? quick : Math.max(1, Math.cei
 
 function src(name) { return fs.readFileSync(path.join(JS, name + '.js'), 'utf8'); }
 
-// Модули приложения — те же файлы, что подключает poker-trainer.html.
+// Модули приложения — те же файлы, что подключает index.html.
 // lang: 'ru' (по умолчанию) или 'en' — язык текстов; у каждого вызова свой экземпляр модулей.
 function loadI18n(lang) {
   const I = new Function('localStorage', src('i18n') + '\n' + src('i18n-en') + '\n;return PKI18n;')(undefined);

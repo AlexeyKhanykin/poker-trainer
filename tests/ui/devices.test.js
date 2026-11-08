@@ -6,7 +6,7 @@ const H = require('../lib/harness');
 const { launch, PAGE_HELPERS, fileUrl } = require('../lib/cdp');
 const { GEO, STRESS } = require('../lib/layout');
 const TS = H.suite('Интерфейс: популярные устройства (Chrome)');
-const URL = fileUrl(path.join(H.ROOT, 'poker-trainer.html'));
+const URL = fileUrl(path.join(H.ROOT, 'index.html'));
 const OUT = path.join(__dirname, '..', 'out', 'devices');
 
 // Размеры — в CSS-пикселях, как их видит браузер. kind: phone — телефон (вкладки внизу), land — телефон лёжа,

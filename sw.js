@@ -4,11 +4,10 @@
 // Порядок: сначала сеть (чтобы после публикации сразу была свежая версия), при ошибке или долгом ответе — сохранённая копия.
 // При установке заранее сохраняются все файлы из ASSETS — тест проверяет, что список совпадает с тем, что подключает страница.
 'use strict';
-const CACHE = 'poker-trainer-v1';
+const CACHE = 'poker-trainer-v2';
 const ASSETS = [
   './',
   'index.html',
-  'poker-trainer.html',
   'manifest.webmanifest',
   'css/style.css',
   'js/i18n.js',
@@ -61,6 +60,6 @@ async function fromCache(req) {
   const hit = await c.match(req, { ignoreSearch: true });
   if (hit) return hit;
   // Переход на страницу без своей копии (например, адрес с параметрами) — отдаём сам тренажёр
-  if (req.mode === 'navigate') { const page = await c.match('poker-trainer.html'); if (page) return page; }
+  if (req.mode === 'navigate') { const page = await c.match('index.html'); if (page) return page; }
   return Response.error();
 }

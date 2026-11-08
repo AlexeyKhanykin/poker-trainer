@@ -15,9 +15,9 @@ const pre = LANG === 'ru' ? '' : LANG + '-';
   try {
     for (const [w, h] of sizes) {
       const p = await b.newPage({ viewport: [w, h], mobile: w < 1024 });
-      await p.goto(fileUrl(path.join(ROOT, 'poker-trainer.html')));
+      await p.goto(fileUrl(path.join(ROOT, 'index.html')));
       const E = c => p.eval(PAGE_HELPERS + c);
-      if (LANG !== 'ru') { await E(`localStorage.setItem('pk-lang', '${LANG}'); return 1`); await p.goto(fileUrl(path.join(ROOT, 'poker-trainer.html'))); }
+      if (LANG !== 'ru') { await E(`localStorage.setItem('pk-lang', '${LANG}'); return 1`); await p.goto(fileUrl(path.join(ROOT, 'index.html'))); }
       await E("await __t.until(() => PKStore.info().backend !== 'memory'); return 1");
       for (const tab of ['trainer', 'game', 'rules', 'stats']) {
         await E(`__t.click('[data-tab=${tab}]'); await __t.sleep(${tab === 'game' ? 900 : 200}); return 1`);

@@ -2,11 +2,260 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d6a4d">
 <title>Покерный тренер</title>
-<meta http-equiv="refresh" content="0; url=poker-trainer.html">
-<link rel="canonical" href="poker-trainer.html">
-<script>location.replace('poker-trainer.html' + location.search + location.hash);</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230d6a4d'/%3E%3Cpath fill='white' transform='translate(18 16) scale(.64)' d='M50 4C38 24 6 40 6 63c0 14 11 23 23 23 9 0 15-4 19-10-1 9-5 16-13 20h30c-8-4-12-11-13-20 4 6 10 10 19 10 12 0 23-9 23-23C94 40 62 24 50 4z'/%3E%3C/svg%3E">
+<meta name="description" content="Тренажёр покера для новичка: комбинации, шансы, решения и игра с ботами. Работает без интернета.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Покер">
+<link rel="stylesheet" href="css/style.css">
 </head>
-<body><p><a href="poker-trainer.html">Открыть покерный тренер</a></p></body>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="suit-0" viewBox="0 0 100 100"><path d="M50 4C38 24 6 40 6 63c0 14 11 23 23 23 9 0 15-4 19-10-1 9-5 16-13 20h30c-8-4-12-11-13-20 4 6 10 10 19 10 12 0 23-9 23-23C94 40 62 24 50 4z"/></symbol>
+  <symbol id="suit-1" viewBox="0 0 100 100"><path d="M50 92C22 70 4 54 4 32 4 17 15 7 29 7c10 0 17 6 21 14 4-8 11-14 21-14 14 0 25 10 25 25 0 22-18 38-46 60z"/></symbol>
+  <symbol id="suit-2" viewBox="0 0 100 100"><path d="M50 3 86 50 50 97 14 50z"/></symbol>
+  <symbol id="suit-3" viewBox="0 0 100 100"><circle cx="50" cy="27" r="20"/><circle cx="26" cy="58" r="20"/><circle cx="74" cy="58" r="20"/><path d="M42 50h16c0 20 5 33 15 44H27c10-11 15-24 15-44z"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="top-in">
+    <div class="brand"><span class="brand-mark"><svg viewBox="0 0 100 100"><use href="#suit-0"/></svg></span><span class="brand-name">Покерный тренер</span></div>
+    <nav class="tabs" role="tablist" id="tabs">
+      <button class="tab-btn" role="tab" data-tab="trainer"><svg class="tab-ic" viewBox="0 0 24 24"><rect x="3" y="5" width="10" height="15" rx="2"/><path d="M15 4.5l4.6 1.3a2 2 0 0 1 1.4 2.4l-3 11.2"/></svg><span class="t-long">Тренажёр комбинаций</span><span class="t-short">Тренажёр</span></button>
+      <button class="tab-btn" role="tab" data-tab="game"><svg class="tab-ic" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="9.5" ry="6.5"/><circle cx="12" cy="12" r="2.2"/></svg><span class="t-long">Игра за столом</span><span class="t-short">Игра</span></button>
+      <button class="tab-btn" role="tab" data-tab="rules"><svg class="tab-ic" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/></svg><span class="t-long">Правила</span><span class="t-short">Правила</span></button>
+      <button class="tab-btn" role="tab" data-tab="stats"><svg class="tab-ic" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span class="t-long">Статистика</span><span class="t-short">Статистика</span></button>
+    </nav>
+    <div class="top-right">
+      <label class="variant-pick" title="Вариант покера: влияет на тренажёр и игру за столом"><span>Вариант</span><select id="variant-select" aria-label="Вариант покера"></select></label>
+      <button class="icon-btn" id="sound-btn" title="Звук: вкл/выкл" aria-label="Звук"></button>
+      <button class="icon-btn" id="help-btn" title="Горячие клавиши (?)" aria-label="Горячие клавиши">?</button>
+      <button class="icon-btn lang-btn" id="lang-btn" type="button"></button>
+      <button class="icon-btn" id="theme-btn" title="Светлая / тёмная тема" aria-label="Переключить тему"></button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- ===== Тренажёр ===== -->
+  <section id="tab-trainer" class="tab-panel">
+    <div class="trainer-grid">
+      <div class="panel trainer-main">
+        <div class="progress-strip" id="progress-strip"></div>
+        <div class="mode-tabs" id="mode-tabs"></div>
+        <div class="mode-bar">
+          <div class="mode-desc" id="mode-desc"></div>
+          <div id="level-ctl"></div>
+          <div class="session" id="session"></div>
+        </div>
+        <div id="task"></div>
+        <div id="feedback" class="feedback"></div>
+        <div id="focus-note" class="focus-note"></div>
+      </div>
+      <aside class="panel cheat" id="cheat"></aside>
+    </div>
+  </section>
+
+  <!-- ===== Игра ===== -->
+  <section id="tab-game" class="tab-panel">
+    <div class="game-grid">
+      <div>
+        <div class="panel game-head">
+          <div class="info" id="game-info"></div>
+          <div class="sp"></div>
+          <label class="switch" title="Клавиша H"><input type="checkbox" id="hints-toggle"> Подсказки <kbd>H</kbd></label>
+          <button class="btn small" id="table-settings-btn"><span class="t-long">Настройки стола</span><span class="t-short">Настройки</span></button>
+          <button class="btn small" id="restart-btn">Новая игра</button>
+        </div>
+        <div class="panel table-panel"><div class="table-wrap"><div class="table-area" id="table"></div><div class="fx-layer" id="fx" aria-hidden="true"></div></div></div>
+        <div class="panel action-bar" id="action-bar"></div>
+      </div>
+      <aside class="side">
+        <div class="panel" id="hint-panel"></div>
+        <div class="panel review" id="review-panel"></div>
+        <div class="panel"><h3>Ход раздачи</h3><div class="log" id="log"></div></div>
+        <div class="panel"><h3>История раздач <small>нажмите, чтобы открыть</small></h3><div class="history" id="history"></div></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ===== Правила ===== -->
+  <section id="tab-rules" class="tab-panel">
+    <div class="rules">
+      <nav class="panel toc">
+        <a href="#r-variants">Варианты покера</a>
+        <a href="#r-goal">Цель игры</a>
+        <a href="#r-flow">Как идёт раздача</a>
+        <a href="#r-actions">Действия</a>
+        <a href="#r-blinds">Блайнды и дилер</a>
+        <a href="#r-pos">Позиции</a>
+        <a href="#r-chart">Таблица стартовых рук</a>
+        <a href="#r-combos">Комбинации</a>
+        <a href="#r-compare">Как сравнивать руки</a>
+        <a href="#r-pots">Олл-ин и побочные банки</a>
+        <a href="#r-odds">Аутсы и шансы</a>
+        <a href="#r-terms">Словарик</a>
+      </nav>
+      <div class="rules-body">
+        <section class="panel" id="r-variants">
+          <h2>Варианты покера</h2>
+          <p>Тренер поддерживает четыре варианта. Выберите нужный в шапке справа — он меняет задания в тренажёре и игру за столом. Статистика по каждому варианту ведётся отдельно.</p>
+          <div class="variant-grid">
+            <div class="variant-card" data-v="holdem"><h3>Техасский холдем</h3><p class="tag">2 карты в руке · безлимит</p>
+              <p>Самый популярный покер. У вас 2 карты, на столе 5 общих. Комбинация — лучшие 5 из 7: можно взять обе свои карты, одну или ни одной.</p>
+              <button class="btn small" data-pick-variant="holdem">Играть в холдем</button></div>
+            <div class="variant-card" data-v="omaha"><h3>Омаха</h3><p class="tag">4 карты в руке · пот-лимит</p>
+              <p>У вас 4 карты, но в комбинацию входят <b>ровно 2 из руки и ровно 3 со стола</b>. Пример: на столе четыре черви, у вас одна червь — флеша нет, нужно две.</p>
+              <p>Руки получаются сильнее, чем в холдеме: на вскрытии часто стриты, флеши и фулл-хаусы.</p>
+              <button class="btn small" data-pick-variant="omaha">Играть в омаху</button></div>
+            <div class="variant-card" data-v="omaha5"><h3>Омаха-5</h3><p class="tag">5 карт в руке · пот-лимит</p>
+              <p>Как омаха, но в руке 5 карт. Правило то же: ровно 2 из руки + 3 со стола. Вариантов собрать комбинацию ещё больше, поэтому для победы обычно нужна очень сильная рука.</p>
+              <button class="btn small" data-pick-variant="omaha5">Играть в омаху-5</button></div>
+            <div class="variant-card" data-v="short"><h3>Шорт-дек (6+)</h3><p class="tag">2 карты · колода 36 карт · безлимит</p>
+              <p>Из колоды убраны двойки–пятёрки. Из-за этого меняется старшинство: <b>флеш старше фулл-хауса</b>, <b>тройка старше стрита</b>. Туз в стрите может быть младшей картой: <span class="cards-inline" data-cards="Ac 6d 7s 8h 9c"></span>.</p>
+              <button class="btn small" data-pick-variant="short">Играть в шорт-дек</button></div>
+          </div>
+          <div class="callout"><b>Безлимит и пот-лимит.</b> В безлимитных играх можно поставить хоть все фишки сразу. В пот-лимите ставка или рейз ограничены размером банка: сначала уравниваете, потом можете повысить ещё на весь банк. Кнопка «Макс. (банк)» ставит этот предел.</div>
+        </section>
+
+        <section class="panel" id="r-goal">
+          <h2>Цель игры</h2>
+          <p>Техасский холдем — покер, в котором у каждого игрока по <b>2 закрытые карты</b> («рука»), а на стол постепенно выкладываются <b>5 общих карт</b>. Из любых пяти карт — своих двух и пяти общих — вы собираете лучшую комбинацию.</p>
+          <p>Выиграть банк можно двумя способами:</p>
+          <ul>
+            <li>дойти до вскрытия и показать самую сильную комбинацию;</li>
+            <li>сделать ставку, на которую никто не ответит, — тогда все сбрасывают карты и банк ваш, даже если карты слабые (это и есть блеф).</li>
+          </ul>
+          <div class="callout">Масти между собой не сравниваются: пиковый флеш не сильнее червового. Если лучшие пять карт одинаковы по рангам — ничья, банк делится.</div>
+        </section>
+
+        <section class="panel" id="r-flow">
+          <h2>Как идёт раздача</h2>
+          <div class="steps">
+            <div class="step"><span class="num">Шаг 1</span><b>Блайнды</b><span>Два игрока слева от дилера ставят обязательные ставки.</span></div>
+            <div class="step"><span class="num">Шаг 2</span><b>Префлоп</b><span>Всем по 2 карты. Первый круг ставок.</span></div>
+            <div class="step"><span class="num">Шаг 3</span><b>Флоп</b><span>На стол выкладывают 3 карты. Круг ставок.</span></div>
+            <div class="step"><span class="num">Шаг 4</span><b>Тёрн</b><span>Четвёртая карта. Круг ставок.</span></div>
+            <div class="step"><span class="num">Шаг 5</span><b>Ривер</b><span>Пятая карта. Последний круг ставок.</span></div>
+            <div class="step"><span class="num">Шаг 6</span><b>Вскрытие</b><span>Оставшиеся игроки открывают карты. Сильнейшая рука забирает банк.</span></div>
+          </div>
+          <p>В каждом круге игроки ходят по очереди по часовой стрелке. Круг заканчивается, когда все оставшиеся в игре поставили одинаково (или пошли олл-ин). Если все, кроме одного, сбросили карты, раздача заканчивается сразу.</p>
+          <p>До флопа первым ходит игрок слева от большого блайнда. После флопа — первый оставшийся игрок слева от дилера.</p>
+        </section>
+
+        <section class="panel" id="r-actions">
+          <h2>Действия</h2>
+          <ul>
+            <li><b>Фолд</b> — сбросить карты и выйти из раздачи. Фишки, которые вы уже поставили, остаются в банке.</li>
+            <li><b>Чек</b> — пропустить ход, ничего не ставя. Можно, только если в этом круге ещё никто не ставил (или вы уже уравняли ставку).</li>
+            <li><b>Колл</b> — уравнять текущую ставку.</li>
+            <li><b>Бет (ставка)</b> — первым поставить фишки в этом круге. Минимальная ставка — большой блайнд.</li>
+            <li><b>Рейз (повышение)</b> — поднять ставку. Повышать нужно минимум на размер предыдущего повышения: если ставка была 40, а её подняли до 100 (+60), следующий рейз — минимум до 160.</li>
+            <li><b>Олл-ин</b> — поставить все свои фишки. Если вашего олл-ина не хватает на полный рейз, он не открывает торги заново для тех, кто уже ходил: они могут только уравнять или сбросить.</li>
+          </ul>
+          <p>Быстрые кнопки за столом: <b>½ банка</b>, <b>банк</b> и <b>олл-ин</b> сразу ставят ползунок на нужный размер ставки.</p>
+        </section>
+
+        <section class="panel" id="r-blinds">
+          <h2>Блайнды и кнопка дилера</h2>
+          <p>Чтобы в каждом банке было за что бороться, два игрока слева от дилера ставят вслепую обязательные ставки: <b>малый блайнд (МБ)</b> и <b>большой блайнд (ББ)</b>, обычно вдвое больше малого.</p>
+          <p>После каждой раздачи кнопка дилера <b>D</b> сдвигается на одно место по часовой стрелке, поэтому платить блайнды приходится всем по очереди.</p>
+          <p>В нашей игре у всех по 1000 фишек, а блайнды растут каждые 8 раздач: 10/20 → 15/30 → 20/40 → 30/60 → 50/100 → 75/150 → 100/200 и дальше. Поэтому ждать «идеальных» карт вечно не получится. Один на один дилер сам ставит малый блайнд.</p>
+        </section>
+
+        <section class="panel" id="r-pos">
+          <h2>Позиции</h2>
+          <p>Позиция — это место относительно дилера. Чем позже вы ходите, тем больше видите: кто поставил, а кто сбросил. Поэтому поздние позиции выгоднее.</p>
+          <ul>
+            <li><b>Ранняя (UTG)</b> — первым до флопа. Играйте только сильные руки.</li>
+            <li><b>Средняя (MP)</b> — после вас ещё несколько игроков.</li>
+            <li><b>Поздняя (CO, катофф)</b> — справа от дилера. Можно играть больше рук.</li>
+            <li><b>Баттон (BTN, дилер)</b> — лучшая позиция: после флопа вы ходите последним.</li>
+            <li><b>Блайнды (SB, BB)</b> — часть денег уже в банке, но после флопа ходите первыми.</li>
+          </ul>
+        </section>
+
+        <section class="panel" id="r-chart">
+          <h2>Таблица стартовых рук</h2>
+          <p>С какими картами входить в банк до флопа, если перед вами все сбросили. Чем позже позиция, тем больше рук можно играть: после вас меньше соперников, и вы ходите последним. Против повышения играют только сильные руки, а с премиум-рукой повышают ещё раз.</p>
+          <div id="hand-chart"></div>
+          <p class="muted sm">Потренироваться можно в тренажёре, в режиме «Играть или сбросить». Таблица — упрощённый ориентир для новичка, а не строгая стратегия.</p>
+        </section>
+
+        <section class="panel" id="r-combos">
+          <h2>Комбинации — от сильной к слабой</h2>
+          <table class="combo-table" id="combo-table"></table>
+          <p class="muted" style="margin-top:10px">Вероятность — как часто комбинация собирается из 7 карт (2 своих + 5 на столе).</p>
+        </section>
+
+        <section class="panel" id="r-compare">
+          <h2>Как сравнивать руки</h2>
+          <ol>
+            <li>Сначала сравнивают <b>категорию</b>: любой флеш бьёт любой стрит, любая тройка бьёт любые две пары.</li>
+            <li>При одинаковой категории сравнивают <b>ранг комбинации</b>: пара тузов сильнее пары королей; в двух парах сначала старшая пара, потом младшая.</li>
+            <li>Если и это совпало, решают <b>кикеры</b> — оставшиеся карты пятёрки, от старшей к младшей. Пример: <span class="cards-inline" data-cards="Ah Kc"></span> и <span class="cards-inline" data-cards="Ad Qs"></span> на столе <span class="cards-inline" data-cards="As 9d 6c 4h 2s"></span> — у обоих пара тузов, но кикер K старше Q.</li>
+            <li>В зачёт идут только 5 карт. Шестая и седьмая не считаются никогда.</li>
+            <li>Если лучшие пятёрки совпадают по рангам — <b>ничья</b>, банк делится поровну. Так бывает, когда оба «играют стол», то есть лучшая пятёрка целиком лежит на столе.</li>
+          </ol>
+          <div class="callout"><b>Колесо.</b> Туз в стрите может быть самой младшей картой: <span class="cards-inline" data-cards="5c 4d 3h 2s Ac"></span> — это стрит до пятёрки, самый слабый стрит. «Перескочить» через туза нельзя: Q-K-A-2-3 — не стрит.</div>
+        </section>
+
+        <section class="panel" id="r-pots">
+          <h2>Олл-ин и побочные банки</h2>
+          <p>Нельзя выиграть у соперника больше, чем вы поставили сами. Если у вас 100 фишек, а соперники ставят по 300, то вы идёте олл-ин на 100 и боретесь только за <b>основной банк</b>: по 100 от каждого.</p>
+          <p>Всё, что соперники ставят сверх этого, уходит в <b>побочный банк</b>, за который борются только они. Пример: у Анны 100, у Бориса и Вики по 300, все в олл-ине.</p>
+          <ul>
+            <li>Основной банк: 100 × 3 = 300 — разыгрывают все трое.</li>
+            <li>Побочный банк: 200 × 2 = 400 — только Борис и Вика.</li>
+          </ul>
+          <p>Если Анна покажет лучшую руку, она получит 300, а побочный банк заберёт сильнейший из двух других. Ставку, которую никто не смог уравнять, возвращают тому, кто её сделал.</p>
+        </section>
+
+        <section class="panel" id="r-odds">
+          <h2>Аутсы и шансы</h2>
+          <p><b>Аутсы</b> — карты, которые ещё в колоде и улучшат вашу руку. Пример: у вас <span class="cards-inline" data-cards="Ah 7h"></span>, на столе <span class="cards-inline" data-cards="Kh 2h 9c"></span>. В колоде осталось 9 червей — у вас <b>9 аутов</b> на флеш.</p>
+          <p><b>Правило 2 и 4.</b> Умножьте число аутов на 2, чтобы прикинуть шанс (в %) получить нужную карту на следующей улице, или на 4 — на флопе, если вы увидите и тёрн, и ривер. 9 аутов ≈ 18% на одну карту и ≈ 36% до ривера.</p>
+          <p><b>Шансы банка.</b> Если в банке 100 и вам нужно уравнять 50, вы рискуете 50, чтобы выиграть 150. Колл выгоден, если вы выигрываете чаще, чем 50 / (100 + 50) ≈ 33% раз. Подсказки за столом считают это за вас.</p>
+        </section>
+
+        <section class="panel" id="r-terms">
+          <h2>Словарик</h2>
+          <dl class="glossary">
+            <dt>Рука</dt><dd>Ваши 2 закрытые карты (или лучшая пятёрка).</dd>
+            <dt>Борд</dt><dd>Общие карты на столе.</dd>
+            <dt>Банк</dt><dd>Все фишки, поставленные в раздаче.</dd>
+            <dt>Стек</dt><dd>Ваши фишки перед вами.</dd>
+            <dt>Кикер</dt><dd>Карта, не входящая в комбинацию, но решающая спор при равных комбинациях.</dd>
+            <dt>Сет / трипс</dt><dd>Тройка: с карманной парой — сет, с одной картой руки — трипс.</dd>
+            <dt>Дро</dt><dd>Недособранная рука: например, 4 карты к флешу.</dd>
+            <dt>Тайт / луз</dt><dd>Тайт играет мало рук, луз — много.</dd>
+            <dt>Агрессивный / пассивный</dt><dd>Агрессивный часто ставит и рейзит, пассивный в основном чекает и коллирует.</dd>
+            <dt>Блеф</dt><dd>Ставка со слабой рукой, чтобы соперник сбросил лучшую.</dd>
+            <dt>Лимп</dt><dd>Просто уравнять большой блайнд до флопа, не повышая.</dd>
+            <dt>Хедз-ап</dt><dd>Игра один на один.</dd>
+          </dl>
+          <p style="margin-top:14px">Обозначения карт: <b>J</b> — валет, <b>Q</b> — дама, <b>K</b> — король, <b>A</b> — туз. Масти: ♠ пики, ♣ трефы (чёрные), ♥ червы, ♦ бубны (красные).</p>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Статистика ===== -->
+  <section id="tab-stats" class="tab-panel"><div id="stats"></div></section>
+</main>
+<div id="modal-root"></div>
+<script src="js/i18n.js"></script>
+<script src="js/i18n-en.js"></script>
+<script src="js/core.js"></script>
+<script src="js/drills.js"></script>
+<script src="js/store.js"></script>
+<script src="js/stats.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/ui.js"></script>
+</body>
 </html>
