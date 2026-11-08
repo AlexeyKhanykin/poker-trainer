@@ -15,7 +15,7 @@
   const now = () => (window.performance && performance.now) ? performance.now() : Date.now();
 
   // ---------- Настройки и вариант ----------
-  const SETTINGS_DEF = { theme: null, hints: true, level: 5, tab: 'trainer', mode: 'name', variant: 'holdem', statsVariant: 'all', statsPeriod: 'all', statsView: 'overview', dailyGoal: 20, sound: true, table: null };
+  const SETTINGS_DEF = { theme: null, hints: true, level: 5, tab: 'trainer', mode: 'name', variant: 'holdem', statsVariant: 'all', statsPeriod: 'all', statsView: 'overview', dailyGoal: 20, sound: true, table: null, installHidden: false };
   const TABLE_DEF = { opp: 5, stack: 1000, speed: 'normal', level: 'normal', showCards: true };
   let settings = PKStore.loadSettings(SETTINGS_DEF);
   if (settings.level === 7) settings.level = 'full';
@@ -1470,11 +1470,40 @@
     window.addEventListener('beforeinstallprompt', e => { PWA.prompt = e; refreshInstall(); });
     window.addEventListener('appinstalled', () => { PWA.prompt = null; toast(tr('Готово: тренажёр установлен как приложение.')); refreshInstall(); });
     document.addEventListener('click', e => {
-      if (!e.target.closest || !e.target.closest('#pwa-install') || !PWA.prompt) return;
+      if (!e.target.closest) return;
+      if (e.target.closest('#install-hide')) { settings.installHidden = true; saveSettings(); return refreshInstall(); }
+      if (!e.target.closest('#pwa-install, #install-go')) return;
+      if (!PWA.prompt) return showInstallHelp();
       const p = PWA.prompt; PWA.prompt = null;
       p.prompt();
       Promise.resolve(p.userChoice).catch(() => {}).then(refreshInstall);
     });
+    refreshInstall();
+  }
+  // Плашка сверху — на телефоне и планшете, когда тренажёр открыт с сайта в браузере. Крестик прячет её навсегда.
+  // На Android кнопка вызывает системную установку; на iPhone сайтам это запрещено — показываем, где нажать в Safari.
+  function renderInstallBar() {
+    const bar = $('#install-bar');
+    if (!bar) return;
+    let touch = false;
+    try { touch = matchMedia('(pointer: coarse)').matches; } catch (e) { /* старый браузер */ }
+    const show = PWA.http && !isStandalone() && !settings.installHidden && (touch || isIOS());
+    bar.hidden = !show;
+    bar.innerHTML = show ? '<button class="ib-go" id="install-go"><span class="ib-ic"><svg viewBox="0 0 100 100"><use href="#suit-0"/></svg></span>' +
+      '<span class="ib-text"><b>' + tr('Установить как приложение') + '</b><span>' + tr('Значок на главном экране, работает без интернета') + '</span></span></button>' +
+      '<button class="icon-btn ib-x" id="install-hide" aria-label="' + tr('Скрыть') + '" title="' + tr('Скрыть') + '">×</button>' : '';
+  }
+  function showInstallHelp() {
+    const ios = isIOS();
+    const steps = ios
+      ? tr('<li>Нажмите «Поделиться» — квадрат со стрелкой вверх. Он внизу или вверху экрана, иногда в меню «⋯».</li>') +
+        tr('<li>Прокрутите список и выберите «На экран „Домой“».</li>') +
+        tr('<li>Нажмите «Добавить» — значок тренажёра появится на главном экране.</li>')
+      : tr('<li>Откройте меню браузера — три точки ⋮ в углу экрана.</li>') +
+        tr('<li>Выберите «Установить приложение» или «Добавить на главный экран».</li>');
+    showModal(tr('Как установить приложение'), '<ol class="install-steps">' + steps + '</ol><p class="muted sm">' +
+      (ios ? tr('Если сайт открылся внутри Telegram, WhatsApp или другого приложения, там такого пункта нет: сначала откройте ссылку в Safari (в меню этого окна — «Открыть в Safari»).')
+        : tr('Если сайт открылся внутри Telegram, WhatsApp или другого приложения, сначала откройте ссылку в Chrome (в меню этого окна — «Открыть в браузере»).')) + '</p>');
   }
   function installHTML() {
     let body;
@@ -1486,7 +1515,7 @@
     return '<div class="panel" id="pwa-panel"><h3>' + tr('Приложение') + '</h3>' + body +
       '<p class="muted sm">' + tr('Статистика привязана к адресу: у тренажёра из файла и с сайта она разная, а на iPhone у приложения на экране «Домой» — своя, отдельно от Safari. Переносите её через резервную копию.') + '</p></div>';
   }
-  function refreshInstall() { const el = $('#pwa-panel'); if (el) el.outerHTML = installHTML(); }
+  function refreshInstall() { const el = $('#pwa-panel'); if (el) el.outerHTML = installHTML(); renderInstallBar(); }
   async function refreshEstimate() {
     const el = $('#st-estimate');
     if (!el) return;

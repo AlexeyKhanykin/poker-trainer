@@ -49,6 +49,35 @@ const TS = H.suite('Интерфейс: приложение с сайта и р
     TS.check('в «Данных» есть панель «Приложение»', !!panel, panel);
     TS.check('с сайта не говорит «открыт из файла»', panel && !/из файла\. Установить/.test(panel), panel);
 
+    TS.group('плашка «Установите на главный экран»');
+    const bar = () => E(`const b = __t.$('#install-bar'), r = b.getBoundingClientRect(), go = __t.$('#install-go');
+      return { shown: !b.hidden && r.height > 0, text: b.innerText, fits: r.right <= innerWidth + 0.5 && (!go || go.getBoundingClientRect().right <= r.right + 0.5), scroll: document.documentElement.scrollWidth > innerWidth }`);
+    for (const w of [390, 320]) {
+      await page.viewport(w, 700, true); await page.touch(true); await E('await __t.sleep(100); return 1');
+      const b = await bar();
+      TS.check(w + ' px: на телефоне с сайта плашка видна', b.shown && /как приложение/.test(b.text), b);
+      TS.check(w + ' px: помещается, без прокрутки вбок', b.fits && !b.scroll, b);
+    }
+    await page.viewport(390, 844, true);
+    // Если Chrome уже предложил установку (как на Android), первое нажатие открывает его окно; второе — уже без него — инструкцию.
+    const help = await E(`__t.click('#install-go'); await __t.sleep(200); const native = !__t.$('#modal-root .modal');
+      if (native) { __t.click('#install-go'); await __t.sleep(200); }
+      const m = __t.$('#modal-root .modal');
+      const r = { native, modal: !!m, steps: __t.$$('#modal-root .install-steps li').length, text: m ? m.innerText : '' }; if (m) __t.click('#modal-root [data-close]'); return r`);
+    TS.check('«Установить» без системного окна — инструкция по шагам', help.modal && help.steps >= 2, help);
+    TS.check('в инструкции — что делать, если ссылка открылась в Telegram', /Telegram/.test(help.text), help.text);
+    await E("__t.click('#install-hide'); await __t.sleep(100); return 1");
+    TS.check('крестик прячет плашку', !(await bar()).shown);
+    await page.reload();
+    await E("await __t.until(() => window.PKStore && document.readyState === 'complete', 5000); await __t.sleep(200); return 1");
+    TS.check('после перезагрузки плашка остаётся скрытой', !(await bar()).shown);
+    await E("const s = JSON.parse(localStorage.getItem('pokerTrainer.settings')); s.installHidden = false; localStorage.setItem('pokerTrainer.settings', JSON.stringify(s)); return 1");
+    await page.viewport(1280, 860, false); await page.touch(false);
+    await page.reload();
+    await E("await __t.until(() => window.PKStore && document.readyState === 'complete', 5000); await __t.sleep(200); return 1");
+    TS.check('на компьютере плашки нет (там есть значок установки в адресной строке)', !(await bar()).shown);
+    await page.viewport(390, 844, true); await page.touch(true);
+
     // Перезагрузка: теперь страницей управляет служебный скрипт
     await page.reload();
     await E("await __t.until(() => window.PKStore && document.readyState === 'complete', 5000); return 1");
